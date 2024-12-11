@@ -123,4 +123,13 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /**
+     * Remote URLs needed to perform this test
+     */
+
+    'sources' => [
+        'products' => 'https://draft.grebban.com/backend/products.json',
+        'attribute_meta' => 'https://draft.grebban.com/backend/attribute_meta.json'
+    ]
+
 ];
