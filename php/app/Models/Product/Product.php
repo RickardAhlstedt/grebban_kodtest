@@ -19,8 +19,8 @@ class Product extends Model
      * @param array $attributes
      */
     public function __construct(int $id, string $name, array $attributes = []) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->attributes = $attributes;
+        $this->attributes['id'] = $id;
+        $this->attributes['name'] = $name;
+        $this->attributes['attributes'] = $attributes;
     }
 }

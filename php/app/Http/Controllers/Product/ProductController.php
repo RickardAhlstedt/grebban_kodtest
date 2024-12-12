@@ -4,8 +4,12 @@ namespace App\Http\Controllers\Product;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product\Attribute;
+use App\Models\Product\Product;
+use App\Models\Product\Term;
 use GuzzleHttp\Client;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
@@ -13,7 +17,7 @@ class ProductController extends Controller
 
     public function __construct() {
         if(!Cache::get('products') || !Cache::get('attributes'))
-            $this->fetchContent(true);
+            $this->fetchContent();
     }
     /**
      * Fetch the content needed for processing
@@ -63,8 +67,20 @@ class ProductController extends Controller
         foreach($data as $attr) {
             $terms = [];
             $termsByCode = [];
-            
+
+            foreach($attr['values'] as $value) {
+                $term = new Term($value['name'], $value['code']);
+                $termsByCode[$term->code] = $term;
+
+                if($term->parentCode && isset($termsByCode[$term->parentCode])) {
+                    $termsByCode[$term->parentCode]->subTerms[] = $term;
+                } else {
+                    $terms[] = $term;
+                }
+            }
+            $tree[] = new Attribute($attr['name'], $attr['code'], $terms);
         }
+        Cache::put('attributes', $tree, 30);
     }
 
     /**
@@ -72,7 +88,38 @@ class ProductController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return void
      */
-    public function index(Request $request): void {
-        
+    public function index(Request $request): Response {
+        $productCache = Cache::get('products_txt');
+        $products = [];
+        $productCollection = new Collection();
+        foreach($productCache as $prod) {
+            $product = new Product($prod['id'], $prod['name'], []);
+            $productCollection->add($product);
+        }
+
+        // $productCollection->sortBy(function($))
+
+        // Implementation if no collection is to be used
+        $totalProducts = count($products);
+        $page = $request->get('page', 1);
+        $pageSize = $request->get('page_size', 5);
+        if($pageSize <= 0)
+            $pageSize = 5;
+
+        $pagesAvailable = $totalProducts / $pageSize;
+        if($page > $pagesAvailable+1) {
+            $page = 1;
+        }
+
+        $productChunks = array_chunk($products, $pageSize);
+
+        $responseObject = [
+            'products' => $productChunks[$page - 1],
+            'page' => intval($page),
+            'totalPages' => intval(ceil($pagesAvailable))
+        ];
+
+        return response($responseObject);
+
     }
 }

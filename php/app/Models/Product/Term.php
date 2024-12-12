@@ -9,7 +9,8 @@ class Term extends Model
     protected $fillable = [
         'name',
         'code',
-        'parentCode'
+        'parentCode',
+        'subTerms'
     ];
 
     public function __construct(string $name, string $code) {
@@ -20,7 +21,7 @@ class Term extends Model
 
     private function retrieveParent(): string|null {
         if(substr_count($this->code, '_') > 1) {
-            return substr($this->code, 0, 6);
+            return substr($this->code, 0, 5);
         }
         return null;
     }
