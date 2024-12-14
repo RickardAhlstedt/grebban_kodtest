@@ -8,14 +8,9 @@ class Attribute extends Model
 {
     protected $fillable = [
         'name',
-        'code',
-        'values'
+        'code'
     ];
 
-    public function __construct(string $name, string $code, array $values = []) {
-        $this->name = $name;
-        $this->code = $code;
-        $this->values = $values;
-    }
+    protected $table = 'attributes';
 
 }

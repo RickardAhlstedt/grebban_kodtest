@@ -12,15 +12,5 @@ class Product extends Model
         'attributes'
     ];
 
-    /**
-     * Create an instance of a product
-     * @param int $id
-     * @param string $name
-     * @param array $attributes
-     */
-    public function __construct(int $id, string $name, array $attributes = []) {
-        $this->attributes['id'] = $id;
-        $this->attributes['name'] = $name;
-        $this->attributes['attributes'] = $attributes;
-    }
+    protected $table = 'products';
 }
