@@ -13,4 +13,16 @@ class Attribute extends Model
 
     protected $table = 'attributes';
 
+    public function terms(): mixed {
+        return $this->hasMany( Term::class, 'attribute_id' );
+    }
+
+    public function getTermsById(int $id) {
+        $attribute = self::with('terms')->find($id);
+        if(!$attribute) {
+            return null;
+        }
+        return $attribute->terms;
+    }
+
 }

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Helpers\SourceHelper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\File;
@@ -25,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
         if(DB::getDriverName() === 'sqlite') {
             DB::statement('PRAGMA foreign_keys = ON;');
         }
+        SourceHelper::checkRemoteForNewVersion();
     }
 
     private function registerHelperFunctions() {
